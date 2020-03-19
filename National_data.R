@@ -96,13 +96,14 @@ new<- data.frame(days=seq(48, 60,1), cases=exp(predict(mod1, newdata=data.frame(
 
 new2<- rbind(cbind(days = cases$day, cases=cases$New, fcast=0),
              cbind(new, fcast=1))
+new2$fcast <- factor(new2$fcast, labels=c("Reported", "Forecast"))
 
-ggplot(new2, aes(x=days, y=cases, col=fcast))+
+ggplot(new2, aes(x=days, y=cases, col=factor(fcast)))+
   geom_line(size=1.2)+
   labs(title= "UK nationally reported coronavirus predictions",
        subtitle = "Data source: PHE / Gov.uk",
-       x = "Date", y = "Cases") +
-  #scale_color_brewer(type="qual")+
+       x = "Day (star 31st Jan 20)", y = "Cases") +
+  scale_color_brewer(type="qual")+
   scale_y_continuous(label = comma)+
   #scale_x_date(date_breaks = "10 day", date_labels = "%b-%d")+
   theme(axis.text.x = element_text(angle = 45),
