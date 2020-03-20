@@ -42,25 +42,35 @@ cases %>%
 
 
 # Now try with tsibble and fable
+library(fable)
+library(fabletools)
 
+# Set at tsibble
 cases_ts <- as_tsibble(cases)
 
+# Use autoplot
 cases_ts %>% autoplot()
 
-
+# FIt various models, as a shot in the dark (ETS is exponential smoothing)
 cases_ts_fit <- cases_ts %>% 
   model( mean = MEAN(New)
          , naive = NAIVE(New)
          , snaive = SNAIVE(New, lag="day")
          , drift = RW(New ~ drift())
+         , ets = ETS(New)
+#        , arima = ARIMA(New ~ error("A")+trend("N")+season("N"))
+         , ses = ETS(New ~ error("A")+trend("N")+season("N"))
+         , sesM = ETS(New ~ error("A")+trend("M")+season("N"))
+         , holt_winter = ETS(New ~ error("A")+trend("A")+season("A"))
+         , holt_winterM = ETS(New ~ error("A")+trend("M")+season("A"))
   )
 
 cases_ts_fit %>% glance()
 cases_ts_fit
 
 
-cases_ts_forcast12d <- cases_ts_fit %>% 
-  forecast(h = "12 days")
+cases_ts_forcast5d <- cases_ts_fit %>% 
+  forecast(h = "5 days")
 
 # Plot
-cases_ts_forcast12d %>% autoplot()
+cases_ts_forcast5d %>% autoplot()
