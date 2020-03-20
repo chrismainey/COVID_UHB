@@ -60,9 +60,11 @@ cases_ts_fit <- cases_ts %>%
          , ets = ETS(New)
 #        , arima = ARIMA(New ~ error("A")+trend("N")+season("N"))
          , ses = ETS(New ~ error("A")+trend("N")+season("N"))
-         , sesM = ETS(New ~ error("A")+trend("M")+season("N"))
+         , sesM = ETS(New ~ error("A")+trend("M")+season("A"))
+         , sesMN = ETS(New ~ error("A")+trend("M")+season("N"))
          , holt_winter = ETS(New ~ error("A")+trend("A")+season("A"))
          , holt_winterM = ETS(New ~ error("A")+trend("M")+season("A"))
+         , holt_winterMN = ETS(New ~ error("A")+trend("M")+season("N"))
   )
 
 cases_ts_fit %>% glance()
