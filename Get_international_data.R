@@ -65,10 +65,16 @@ data %>%
 
 
 # Apply same forecasting methods as national
+data %>% 
+  filter(`Countries and territories` %in% c("United_Kingdom")) %>% 
+  arrange(DateRep) %>% 
+  mutate(cumulative = cumsum(Deaths)) %>% 
+  as.data.frame()
 
 # Set at tsibble
 
 library(fable)
+library(dplyr)
 
 cases_ts <- data %>% 
   mutate(DateRep = as.Date(DateRep)) %>% 
@@ -107,7 +113,7 @@ cases_ts_fit <- cases_ts %>%
     #, holt_winterMN_case = ETS(Cases ~ error("A")+trend("M")+season("N"))
     
      #ets_death = ETS(log(dts))
-     ses_death = ETS(log(dts) ~ error("A")+trend("A")+season("N"))
+     ses_death = ETS(log(Deaths + 1) ~ error("A")+trend("A")+season("N"))
     #, sesM_death = ETS(log(dts) ~ error("A")+trend("M")+season("A"))
     #, sesMN_death = ETS(log(dts) ~ error("A")+trend("M")+season("N"))
     #, holt_winter_death = ETS(log(dts) ~ error("A")+trend("A")+season("A"))
@@ -125,9 +131,11 @@ cases_ts_fit
 cases_ts_forcast5d <- cases_ts_fit %>% 
   forecast(h = "5 days")
   
+components(cases_ts_fit)
 
 
-death_pred<-cases_ts_forcast5d %>% autoplot()
+cases_ts_forcast5d %>% autoplot()
+
 
 cases_ts_forcast5d <- cases_ts_fit %>% 
   forecast(h = "5 days") %>% 
@@ -157,7 +165,7 @@ mutate(DateRep = as.Date(DateRep)) %>%
   filter(`Countries and territories` %in% c("United_Kingdom")) %>% 
   select(Country = `Countries and territories`, DateRep, Deaths) %>% 
   
-  pivot_longer(cols = c(Cases, Deaths)
+  pivot_longer(cols = c(Deaths)
                , values_to = "Count"
                , names_to = "Measure"
   ) %>% 
