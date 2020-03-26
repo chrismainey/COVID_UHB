@@ -30,6 +30,10 @@ data$`Countries and territories` <- factor(data$`Countries and territories`)
 # See which countries are in there
 levels(data$`Countries and territories`)
 
+#take data back one day, as it reported a day later accoridng to DM and DG 
+data$DateRep = as.Date(data$DateRep)
+data$DateRep = data$DateRep - 1
+
 # Load packages
 lapply(c("dplyr", "tidyr", "Cairo", "ggplot2", "scales"), require, character.only=TRUE)
 
@@ -45,8 +49,9 @@ theme_set(
 
 # Quick plot of cases
 data %>% 
-  mutate(DateRep = as.Date(DateRep)) %>% 
-  filter(`Countries and territories` %in% c("United_Kingdom", "Italy", "China")) %>% 
+  #mutate(DateRep = as.Date(DateRep)) %>% 
+  #mutate(DateRep2 = DateRep - 1) %>% 
+  filter(`Countries and territories` %in% c("United_Kingdom", "Italy")) %>% 
   select(DateRep, Cases, Deaths, Country = `Countries and territories`) %>% 
   pivot_longer(cols = c(Cases, Deaths)
                , values_to = "Count"
@@ -54,7 +59,7 @@ data %>%
                ) %>% 
   ggplot(aes(x=DateRep, y=Count, col=Country, linetype=Measure))+
   geom_line(size=1)+
-  labs(title= "International coronavirus infections",
+ labs(title= "International coronavirus infections",
        subtitle = "Data source: Ecdc daily",
        x = "Date", y = "Cases") +
   scale_color_brewer(type="qual")+
@@ -137,7 +142,7 @@ components(cases_ts_fit)
 cases_ts_forcast5d %>% autoplot()
 
 
-cases_ts_forcast5d <- cases_ts_fit %>% 
+cases_ts_fit %>% 
   forecast(h = "5 days") %>% 
   hilo() %>% 
   tidyr::unnest(cols = c(`80%`, `95%`), names_repair="universal")
